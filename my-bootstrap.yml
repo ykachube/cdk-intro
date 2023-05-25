@@ -1,5 +1,8 @@
 Description: This stack includes resources needed to deploy AWS CDK apps into this environment
 Parameters:
+  PermissionsBoundaryPolicy:
+    Type: String
+    Default: ''
   TrustedAccounts:
     Description: List of AWS accounts that are trusted to publish assets and deploy stacks to this environment
     Default: ""
@@ -52,6 +55,10 @@ Parameters:
     Default: "AWS CDK: Default Resources"
     Description: Describe the provenance of the resources in this bootstrap stack. Change this when you customize the template. To prevent accidents, the CDK CLI will not overwrite bootstrap stacks with a different variant.
 Conditions:
+  HasPermissionsBoundary: !Not
+    - !Equals
+      - !Ref PermissionsBoundaryPolicy
+      - ''
   HasTrustedAccounts:
     Fn::Not:
       - Fn::Equals:
@@ -268,6 +275,11 @@ Resources:
   FilePublishingRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary:
+        Fn::If:
+          - HasPermissionsBoundary
+          - !Ref PermissionsBoundaryPolicy
+          - !Ref AWS::NoValue
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
@@ -291,6 +303,11 @@ Resources:
   ImagePublishingRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary:
+        Fn::If:
+          - HasPermissionsBoundary
+          - !Ref PermissionsBoundaryPolicy
+          - !Ref AWS::NoValue
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
@@ -314,6 +331,11 @@ Resources:
   LookupRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary:
+        Fn::If:
+          - HasPermissionsBoundary
+          - !Ref PermissionsBoundaryPolicy
+          - !Ref AWS::NoValue
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
@@ -418,6 +440,11 @@ Resources:
   DeploymentActionRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary:
+        Fn::If:
+          - HasPermissionsBoundary
+          - !Ref PermissionsBoundaryPolicy
+          - !Ref AWS::NoValue
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
@@ -513,6 +540,11 @@ Resources:
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary:
+        Fn::If:
+          - HasPermissionsBoundary
+          - !Ref PermissionsBoundaryPolicy
+          - !Ref AWS::NoValue
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
